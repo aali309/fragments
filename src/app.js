@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
   // Send a 200 'OK' response with info about our repo
   res.status(200).json({
     status: 'ok',
-    author: 'Atif Ali',
+    author,
     // TODO: change this to use your GitHub username!
     githubUrl: 'https://github.com/aali309/fragments',
     version,
