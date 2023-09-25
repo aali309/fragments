@@ -1,4 +1,5 @@
 // src/logger.js
+require('dotenv').config();
 
 // Use `info` as our standard log level if not specified
 const options = { level: process.env.LOG_LEVEL || 'info' };
