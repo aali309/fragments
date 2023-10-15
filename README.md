@@ -95,3 +95,15 @@ env.jest  jest.config.js  package.json  README.md  src  tests`
 - Use the AWS CLI to [start & stop your instance]
 - `aws ec2 start-instances --instance-ids {instance-id}`
 - `aws ec2 stop-instances --instance-ids {instance-id}`
+
+## ec2 build-image & run container
+
+- we need sudo command with terminal i.e `sudo`
+- check status `status docker.service` if running or not i.e ` Active: inactive (dead)`
+- sudo docker build -t fragments:latest .
+- `sudo service docker start` start docker
+- running a container `sudo docker run --rm --name fragments --env-file env.jest -e LOG_LEVEL=debug -p 8080:8080 -d fragments:latest` just like above steps it will produce and ID that will be used to manage it.
+- using curl `sudo curl ec2-35-174-167-51.compute-1.amazonaws.com:8080`
+- getting docker logs `sudo docker logs -f 41b9e506eaeca6a432675ef7b29c3922b50a62da8eea23c0185cb9a870073f08` the 41b is the id produced on line 103 after running in a detached mode
+- To see a list of all Docker processes running `sudo docker ps`
+- To kill `sudo docker kill <CONTAINER ID>`
