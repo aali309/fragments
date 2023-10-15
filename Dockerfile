@@ -44,6 +44,4 @@ FROM node:18.13.0
   EXPOSE 8080
 
 
-# docker ps # get the id of the running container
-# docker stop <container> # kill it (gracefully)
-# ctrl+c does not work
+
