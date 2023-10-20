@@ -99,7 +99,7 @@ env.jest  jest.config.js  package.json  README.md  src  tests`
 ## ec2 build-image & run container
 
 - we need sudo command with terminal i.e `sudo`
-- check status `status docker.service` if running or not i.e ` Active: inactive (dead)`
+- check status `service docker status` if running or not i.e ` Active: inactive (dead)`
 - sudo docker build -t fragments:latest .
 - `sudo service docker start` start docker
 - running a container `sudo docker run --rm --name fragments --env-file env.jest -e LOG_LEVEL=debug -p 8080:8080 -d fragments:latest` just like above steps it will produce and ID that will be used to manage it.
@@ -107,3 +107,40 @@ env.jest  jest.config.js  package.json  README.md  src  tests`
 - getting docker logs `sudo docker logs -f 41b9e506eaeca6a432675ef7b29c3922b50a62da8eea23c0185cb9a870073f08` the 41b is the id produced on line 103 after running in a detached mode
 - To see a list of all Docker processes running `sudo docker ps`
 - To kill `sudo docker kill <CONTAINER ID>`
+
+## Push a contain image after building the image also adding tags
+
+- `docker tag fragments username/fragments`
+- `docker tag fragments username/fragments:lab6`
+- Before we can `push` to our [Docker Hub](https://hub.docker.com/) repository, we'll need to authenticate our `docker` CLI.
+
+  ` docker login --username <username> --password <password>`
+  WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+  Login Succeeded
+
+- Now that we have properly tagged our image and logged our Docker client
+
+```sh
+   $ docker push username/fragments
+   Using default tag: latest
+   The push refers to repository [docker.io/username/fragments]
+   19b14f8ddced: Pushed
+   20fd1c4da4b5: Pushed
+   9d7235b311a7: Pushed
+   46ed507c2568: Pushed
+   7e635b74a1d2: Pushed
+   8b49835c1b3d: Mounted from library/node
+   b8d043e96649: Mounted from library/node
+   046bce467327: Mounted from library/node
+   3e970f5a8ef5: Mounted from library/node
+   a08554eb77fd: Mounted from library/node
+   3d6a0f7f806b: Mounted from library/node
+   1a9388cb81f7: Mounted from library/node
+   9f627e73d807: Mounted from library/node
+   62994d6a7208: Mounted from library/node
+   latest: digest: sha256:a27f20742a31849370a91608fd731087a686c662ea6fd16fc50b112a3c41e61c size: 3258
+```
+
+- Tag while building multiple images and pushing
+  `docker build -t username/fragments:latest -t username/fragments:lab-6 -t username/fragments:90f9154 .`
+  `docker push --all-tags user/fragments`

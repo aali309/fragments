@@ -4,7 +4,8 @@
 # starting point for our own image. Our `fragments` image will be _based_ on other Docker images.
 
 # Use node version 18.13.0
-FROM node:18.13.0
+# stage 1 build-stage
+FROM node:18.16.0 AS build
 
 # Metadata about the image
   LABEL maintainer="Atif Ali <aali309@myseneca.ca>"
@@ -21,8 +22,8 @@ FROM node:18.13.0
   # Disable colour when run inside Docker
   # https://docs.npmjs.com/cli/v8/using-npm/config#color
     ENV NPM_CONFIG_COLOR=false
-
-# working directory
+  
+  # working directory
   WORKDIR /app
 
 # Copy package.json and package-lock.json files
@@ -33,6 +34,12 @@ FROM node:18.13.0
 
 # Copy src to /app/src/
   COPY ./src ./src
+
+# stage 2 production-stage
+  FROM node:18.16.0
+
+# Copy built files from the previous stage
+  COPY --from=build /app /app
 
 # Copy our HTPASSWD file
   COPY ./tests/.htpasswd ./tests/.htpasswd
