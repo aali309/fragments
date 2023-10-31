@@ -42,10 +42,11 @@ FROM node:18.16.0 AS build
   COPY --from=build /app /app
 
 # Copy our HTPASSWD file
+# hadolint ignore=DL3045
   COPY ./tests/.htpasswd ./tests/.htpasswd
 
 # Start the container by running our server
-  CMD npm start
+  CMD ["npm", "start"]
 
 # We run our service on port 8080
   EXPOSE 8080
