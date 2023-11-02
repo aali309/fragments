@@ -32,14 +32,17 @@ FROM node:18.16.0 AS build
 # Install node dependencies defined in package-lock.json
   RUN npm install
 
-# Copy src to /app/src/
-  COPY ./src ./src
-
 # stage 2 production-stage
   FROM node:18.16.0
 
+ # working directory
+  WORKDIR /app
+
 # Copy built files from the previous stage
   COPY --from=build /app /app
+  
+# Copy src to /app/src/
+  COPY ./src ./src
 
 # Copy our HTPASSWD file
 # hadolint ignore=DL3045
