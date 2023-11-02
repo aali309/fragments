@@ -43,5 +43,14 @@
     "pino-http": "^8.5.0",
     "pino-pretty": "^10.2.0",
     "stoppable": "^1.1.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/aali309/fragments/issues"
+  },
+  "homepage": "https://github.com/aali309/fragments#readme",
+  "main": ".eslintrc.js",
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": []
 }
