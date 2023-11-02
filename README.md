@@ -144,3 +144,20 @@ env.jest  jest.config.js  package.json  README.md  src  tests`
 - Tag while building multiple images and pushing
   `docker build -t username/fragments:latest -t username/fragments:lab-6 -t username/fragments:90f9154 .`
   `docker push --all-tags user/fragments`
+
+## connect to Amazon Elastic Container Registry
+
+On an **EC2 instance**, use `docker` to `run` your `fragments` server via the `v0.7.0` tag (or whatever your last successfully tagged image was) built by GitHub Actions on your [Amazon Elastic Container Registry](https://aws.amazon.com/ecr/) `fragments` repo. Doing so will require you to first login the `docker` client with your [Amazon Elastic Container Registry](https://aws.amazon.com/ecr/). The `aws` CLI provides a way to get a temporary password that we can pipe to `docker`. _NOTE: a previous version of this lab gave instructions for the AWS CLI v1 vs. v2, and the instructions have changed._
+
+The following commands **must** be run on your EC2 instance:
+
+```sh
+# Define Environment Variables for all AWS Credentials.  Use the Learner Lab AWS CLI Credentials:
+$ export AWS_ACCESS_KEY_ID=<learner-lab-access-key-id>
+$ export AWS_SECRET_ACCESS_KEY=<learner-lab-secret-access-key>
+$ export AWS_SESSION_TOKEN=<learner-lab-session_token>
+$ export AWS_DEFAULT_REGION=us-east-1
+
+# Login the EC2's docker client, swapping your full ECR registry name
+$ sudo docker login -u AWS -p $(aws ecr get-login-password --region us-east-1) 4xxxxxxxxxx5.dkr.ecr.us-east-1.amazonaws.com
+```
