@@ -22,7 +22,6 @@ const rawBody = () =>
   });
 
 module.exports = async (req, res) => {
-  console.log(req.body);
   if (!Buffer.isBuffer(req.body)) {
     logger.warn('POST /fragments received unsupported media type');
     return res.status(400).json(createErrorResponse(400, 'Bad Request'));

@@ -5,11 +5,8 @@ const helmet = require('helmet');
 const compression = require('compression');
 const passport = require('passport');
 const { createErrorResponse } = require('./response');
-// author and version from our package.json file
-//const { author, version } = require('../package.json');
 const authenticate = require('./auth');
 const logger = require('./logger');
-
 const pino = require('pino-http')({
   // Use our default logger instance, which is already configured
   logger,
@@ -18,9 +15,6 @@ const pino = require('pino-http')({
 // Create an express app instance we can use to attach middleware and HTTP routes
 const app = express();
 
-// Set up our passport authentication middleware
-passport.use(authenticate.strategy());
-app.use(passport.initialize());
 // Use pino logging middleware
 app.use(pino);
 
@@ -32,6 +26,10 @@ app.use(cors());
 
 // Use gzip/deflate compression middleware
 app.use(compression());
+
+// Set up our passport authentication middleware
+passport.use(authenticate.strategy());
+app.use(passport.initialize());
 
 // Define our routes
 app.use('/', require('./routes'));

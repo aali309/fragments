@@ -27,7 +27,6 @@ router.get('/', (req, res) => {
     createSuccessResponse({
       status: 'ok',
       author,
-      // Use your own GitHub URL for this!
       githubUrl: 'https://github.com/aali309/fragments',
       version,
     })
