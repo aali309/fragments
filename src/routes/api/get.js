@@ -1,33 +1,36 @@
-// src/routes/api/get.js
-
 const { createSuccessResponse, createErrorResponse } = require('../../response');
-const Fragment = require('../../model/fragment').Fragment;
-// eslint-disable-next-line valid-jsdoc
-/**
- * Get a list of fragments for the current user
- */
-module.exports = async (req, res) => {
-  // TODO: this is just a placeholder to get something working...
-  var metadata;
-  var ownerID = require('crypto').createHash('sha256').update(req.user).digest('hex');
+const { Fragment } = require('../../model/fragment');
+const logger = require('../../logger');
 
-  metadata = await Fragment.byUser(ownerID, req.query.expand);
+const getFragments = async (req, res) => {
+  const { expand } = req.query;
 
-  //console.log(metadata);
-
-  if (!metadata) {
-    res.status(404).json(
-      createErrorResponse({
-        status: 404,
-        err: 'Metadata with given id does not exist',
-      })
-    );
+  if (expand === '1') {
+    const fragments = await Fragment.byUser(req.user, true);
+    res.status(200).json(createSuccessResponse({ fragments }));
+  } else {
+    const fragments = await Fragment.byUser(req.user, false);
+    res.status(200).json(createSuccessResponse({ fragments }));
   }
-
-  res.status(200).json(
-    createSuccessResponse({
-      status: 'ok',
-      fragments: [metadata],
-    })
-  );
 };
+
+const getFragmentById = async (req, res, next) => {
+  try {
+    const fragment = await Fragment.byId(req.user, req.params.id);
+    res.status(200).json(createSuccessResponse(fragment));
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getFragmentMetaDataById = async (req, res) => {
+  try {
+    const fragment = await Fragment.byId(req.user, req.params.id);
+    logger.debug({ fragment }, 'GET /fragments/:id/info');
+    res.status(200).json(createSuccessResponse(fragment));
+  } catch (error) {
+    res.status(500).json(createErrorResponse(500, error.message));
+  }
+};
+
+module.exports = { getFragments, getFragmentById, getFragmentMetaDataById };

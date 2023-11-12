@@ -12,47 +12,47 @@ const {
   writeFragmentData,
   listFragments,
   deleteFragment,
-} = require('./data');
+} = require('./data/memory');
 
-const validTypes = [
-  `text/plain`,
-  `text/markdown`,
-  `text/html`,
-  `application/json`,
-
-  /* currently only the above are supported
-  `image/png`,
-  `image/jpeg`,
-  `image/webp`,
-  `image/gif`,
-  */
-];
+const validTypes = {
+  txt: 'text/plain',
+  txtCharset: 'text/plain; charset=utf-8',
+  md: 'text/markdown',
+  html: 'text/html',
+  json: 'application/json',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  webp: 'image/webp',
+  gif: 'image/gif',
+};
 
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
-    // TODO
-    if (ownerId == undefined && type == undefined)
-      throw 'ownerId and type are required to create a new class!';
-    else if (ownerId == undefined || type == undefined)
-      throw 'ownerId and type are required to create a new class!';
-    else this.ownerId = ownerId;
+    if (!ownerId || !type) {
+      throw Error('ownerId or type is missing!');
+    }
 
-    if (this.isSupportedType(type)) {
-      for (let i = 0; i < validTypes.length; i++)
-        if (type.includes(validTypes[i])) this.type = type;
-    } else throw 'Invalid type has been passed!';
+    if (!Fragment.isSupportedType(type)) {
+      throw Error('type is not supported!');
+    }
 
-    if (typeof size != 'number' || size < 0) throw 'size must me a number and greater than -1!';
-    else this.size = size;
+    if (size) {
+      // will be sure size to be a number and have a value greater than -1
+      if (Number.isInteger(size) && size > -1) {
+        this.size = size;
+      } else {
+        throw Error('size does not have valid value!');
+      }
+    } else {
+      this.size = 0;
+    }
 
-    if (id == undefined || id == '') this.id = randomUUID();
-    else this.id = id;
-
-    if (created == undefined) this.created = new Date().toISOString();
-    else this.created = created;
-
-    if (updated == undefined) this.updated = new Date().toISOString();
-    else this.updated = updated;
+    this.id = id || randomUUID();
+    this.ownerId = ownerId;
+    this.created = created || new Date().toISOString();
+    this.updated = updated || new Date().toISOString();
+    this.type = type;
+    this.size = size;
   }
 
   /**
@@ -62,9 +62,11 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    // TODO
-    var values = await listFragments(ownerId, expand);
-    return Promise.resolve(values);
+    try {
+      return await listFragments(ownerId, expand);
+    } catch (error) {
+      throw new Error('Can not get fragments for the current user.');
+    }
   }
 
   /**
@@ -74,40 +76,30 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    // TODO
-    var value = await readFragment(ownerId, id);
-    if (value == undefined) throw Error();
-    return Promise.resolve(value);
+    const fragment = await readFragment(ownerId, id);
+    if (!fragment) {
+      throw new Error('There is no fragment with provided ownerId or id.');
+    }
+    return fragment;
   }
 
   /**
    * Delete the user's fragment data and metadata for the given id
    * @param {string} ownerId user's hashed email
    * @param {string} id fragment's id
-   * @returns Promise
+   * @returns Promise<void>
    */
-  static async delete(ownerId, id) {
-    // TODO
-    return Promise.resolve(await deleteFragment(ownerId, id));
+  static delete(ownerId, id) {
+    return deleteFragment(ownerId, id);
   }
 
   /**
    * Saves the current fragment to the database
-   * @returns Promise
+   * @returns Promise<void>
    */
   async save() {
-    // TODO
-    return new Promise((resolve, reject) => {
-      writeFragment(this)
-        .then(() => {
-          this.updated = new Date().toISOString();
-          console.log(this.updated.toString()); //testing
-          resolve();
-        })
-        .catch(() => {
-          reject();
-        });
-    });
+    this.updated = new Date().toISOString();
+    return await writeFragment(this);
   }
 
   /**
@@ -115,24 +107,22 @@ class Fragment {
    * @returns Promise<Buffer>
    */
   async getData() {
-    // TODO
-    var obj = await readFragmentData(this.ownerId, this.id);
-    const value = Buffer.from(obj);
-    console.log(value.toString()); // testing
-    return value;
+    return await readFragmentData(this.ownerId, this.id);
   }
 
   /**
    * Set's the fragment's data in the database
    * @param {Buffer} data
-   * @returns Promise
+   * @returns Promise<void>
    */
   async setData(data) {
-    // TODO
-    if (data == '') throw 'Data is empty or undefined!';
+    if (!(data instanceof Buffer)) {
+      throw new Error('Data must be an instance of Buffer.');
+    }
+
+    this.size = data.length;
     this.updated = new Date().toISOString();
-    this.size++;
-    return writeFragmentData(this.ownerId, this.id, data.toString());
+    return await writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -150,9 +140,7 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    // TODO
-    if (this.type.includes('text')) return true;
-    else return false;
+    return this.mimeType.startsWith('text/');
   }
 
   /**
@@ -160,12 +148,32 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    // TODO
-    var types_ = [];
-    for (let i = 0; i < validTypes.length; ++i)
-      if (this.type.includes(validTypes[i])) types_.push(validTypes[i]);
+    let mimeTypes = [];
 
-    return types_;
+    switch (this.type) {
+      case validTypes.txt:
+      case validTypes.txtCharset:
+        mimeTypes = [validTypes.txt];
+        break;
+      case validTypes.md:
+        mimeTypes = [validTypes.md, validTypes.txt, validTypes.html];
+        break;
+      case validTypes.html:
+        mimeTypes = [validTypes.html, validTypes.txt];
+        break;
+      case validTypes.json:
+        mimeTypes = [validTypes.json, validTypes.txt];
+        break;
+      case validTypes.png:
+      case validTypes.jpg:
+      case validTypes.webp:
+      case validTypes.gif:
+        mimeTypes = [validTypes.png, validTypes.jpg, validTypes.webp, validTypes.gif];
+        break;
+      default:
+        mimeTypes = [];
+    }
+    return mimeTypes;
   }
 
   /**
@@ -174,18 +182,7 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // TODO
-    for (var i = 0; i < validTypes.length; i++) {
-      if (value.includes(validTypes[i])) return true;
-    }
-    return false;
-  }
-
-  isSupportedType(value) {
-    for (var i = 0; i < validTypes.length; i++) {
-      if (value.includes(validTypes[i])) return true;
-    }
-    return false;
+    return Object.values(validTypes).includes(value);
   }
 }
 
