@@ -161,3 +161,9 @@ $ export AWS_DEFAULT_REGION=us-east-1
 # Login the EC2's docker client, swapping your full ECR registry name
 $ sudo docker login -u AWS -p $(aws ecr get-login-password --region us-east-1) 4xxxxxxxxxx5.dkr.ecr.us-east-1.amazonaws.com
 ```
+
+sudo docker run --rm --name fragments --env-file env.jest -e LOG_LEVEL=debug -p 8080:8080 -d 557688147281.dkr.ecr.us-east-1.amazonaws.com/fragments:A2
+
+## Run Integration Test
+
+`npm run test:integration`
