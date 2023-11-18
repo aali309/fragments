@@ -1,10 +1,10 @@
 const { Fragment } = require('../../model/fragment');
-const { createSuccessResponse } = require('../../response');
+const { createSuccessResponse, createErrorResponse } = require('../../response');
 
 module.exports = async (req, res, next) => {
   try {
     if (!Fragment.isSupportedType(req.headers['content-type'])) {
-      throw new Error('Invalid type');
+      return res.status(415).json(createErrorResponse(415, 'type is not supported!'));
     }
 
     const fragment = new Fragment({
