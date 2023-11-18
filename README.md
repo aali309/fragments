@@ -167,3 +167,33 @@ sudo docker run --rm --name fragments --env-file env.jest -e LOG_LEVEL=debug -p 
 ## Run Integration Test
 
 `npm run test:integration`
+
+## Build and run services with
+
+`docker compose up`
+
+Stop the server with `CTRL+C`.
+run your service(s) in the background using `-d`, and use `down` to stop them:
+
+```sh
+docker compose up -d
+docker compose down
+```
+
+> NOTE: if you make changes to your `fragments` source code, and want to rebuild your Docker image, you can use the `--build` flag to force a rebuild:
+> `docker compose up --build`
+
+Make sure you can access all three services:
+
+```sh
+$ curl localhost:8080
+{"status":"ok","author":"David Humphrey <david.humphrey@senecacollege.ca>","githubUrl":"https://github.com/humphd/fragments","version":"0.8.0"}
+
+$ curl localhost:8000
+{"__type":"com.amazonaws.dynamodb.v20120810#MissingAuthenticationToken","Message":"Request must contain either a valid (registered) AWS access key ID or X.509 certificate."}
+
+> NOTE: use `localhost:4566/_localstack/health` route for accessing LocalStack healthcheck endpoint.
+
+$ curl localhost:4566/_localstack/health
+{"services": {"acm": "available", "apigateway": "available", "cloudformation": "available", "cloudwatch": "available", "config": "available", "dynamodb": "available", "dynamodbstreams": "available", "ec2": "available", "es": "available", "events": "available", "firehose": "available", "iam": "available", "kinesis": "available", "kms": "available", "lambda": "available", "logs": "available", "opensearch": "available", "redshift": "available", "resource-groups": "available", "resourcegroupstaggingapi": "available", "route53": "available", "route53resolver": "available", "s3": "available", "s3control": "available", "secretsmanager": "available", "ses": "available", "sns": "available", "sqs": "available", "ssm": "available", "stepfunctions": "available", "sts": "available", "support": "available", "swf": "available", "transcribe": "available"}, "version": "2.0.0.dev"}
+```
