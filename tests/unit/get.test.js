@@ -53,7 +53,7 @@ describe('GET /v1/fragments/:id', () => {
     const res = await request(app)
       .get(`/v1/fragments/randomId`)
       .auth('atifhammud@outlook.com', '401098004Tif@');
-    expect(res.statusCode).toBe(500);
+    expect(res.statusCode).toBe(404);
   });
 });
 
@@ -88,6 +88,6 @@ describe('GET /v1/fragments/:id/info', () => {
     const res = await request(app)
       .get(`/v1/fragments/randomId/info`)
       .auth('atifhammud@outlook.com', '401098004Tif@');
-    expect(res.statusCode).toBe(500);
+    expect(res.statusCode).toBe(404);
   });
 });
