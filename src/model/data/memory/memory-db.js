@@ -28,7 +28,7 @@ class MemoryDB {
    * Puts a value into the given primaryKey and secondaryKey
    * @param {string} primaryKey
    * @param {string} secondaryKey
-   * @returns {Promise<void>}
+   * @returns {Promise}
    */
   put(primaryKey, secondaryKey, value) {
     if (!(validateKey(primaryKey) && validateKey(secondaryKey))) {
@@ -49,7 +49,7 @@ class MemoryDB {
    * Queries the list of values (i.e., secondaryKeys) for the given primaryKey.
    * Always returns an Array, even if no items are found.
    * @param {string} primaryKey
-   * @returns {Promise<any[]>}
+   * @returns Promise<any[]>
    */
   query(primaryKey) {
     if (!validateKey(primaryKey)) {
@@ -66,7 +66,7 @@ class MemoryDB {
    * Deletes the value with the given primaryKey and secondaryKey
    * @param {string} primaryKey
    * @param {string} secondaryKey
-   * @returns {Promise<void>}
+   * @returns Promise<void>
    */
   async del(primaryKey, secondaryKey) {
     if (!(validateKey(primaryKey) && validateKey(secondaryKey))) {

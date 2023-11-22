@@ -46,6 +46,7 @@ describe('GET /v1/fragments/:id', () => {
     const getResponse = await request(app)
       .get(`/v1/fragments/${postResponse.body.fragment.id}`)
       .auth('atifhammud@outlook.com', '401098004Tif@');
+
     expect(getResponse.statusCode).toBe(200);
   });
 
@@ -53,7 +54,93 @@ describe('GET /v1/fragments/:id', () => {
     const res = await request(app)
       .get(`/v1/fragments/randomId`)
       .auth('atifhammud@outlook.com', '401098004Tif@');
+
     expect(res.statusCode).toBe(404);
+  });
+});
+
+describe('GET /fragments/:id.ext', () => {
+  // If the request is missing the Authorization header, it should be forbidden
+  test('unauthenticated requests are denied', () =>
+    request(app).get('/v1/fragments/:id.ext').expect(401));
+
+  // If the wrong username/password pair are used (no such user), it should be forbidden
+  test('incorrect credentials are denied', () =>
+    request(app)
+      .get('/v1/fragments/:id.ext')
+      .auth('invalid@email.com', 'incorrect_password')
+      .expect(401));
+
+  // If ext is not supported it should deny the request
+  test('unsupported extension types are denied', async () => {
+    const postResponse = await request(app)
+      .post('/v1/fragments')
+      .auth('atifhammud@outlook.com', '401098004Tif@')
+      .set({
+        'Content-Type': 'text/plain',
+        body: 'This is a fragment',
+      });
+
+    const getResponse = await request(app)
+      .get(`/v1/fragments/${postResponse.body.fragment.id}.xml`)
+      .auth('atifhammud@outlook.com', '401098004Tif@');
+
+    expect(getResponse.statusCode).toBe(415);
+    expect(getResponse.body.error.message).toBe('Extension type is not supported.');
+  });
+
+  // if conversion is not allowed it should deny the request
+  test('unsupported conversions are denied', async () => {
+    const postResponse = await request(app)
+      .post('/v1/fragments')
+      .auth('atifhammud@outlook.com', '401098004Tif@')
+      .set({
+        'Content-Type': 'text/plain',
+        body: 'This is a fragment',
+      });
+
+    const getResponse = await request(app)
+      .get(`/v1/fragments/${postResponse.body.fragment.id}.png`)
+      .auth('atifhammud@outlook.com', '401098004Tif@');
+
+    expect(getResponse.statusCode).toBe(415);
+    expect(getResponse.body.error.message).toBe('Conversion is not allowed.');
+  });
+
+  // Successful conversion from txt to txt
+  test('Convert fragment data from md to html', async () => {
+    const postResponse = await request(app)
+      .post('/v1/fragments')
+      .auth('atifhammud@outlook.com', '401098004Tif@')
+      .set({
+        'Content-Type': 'text/plain',
+        body: 'This is a fragment',
+      });
+
+    const getResponse = await request(app)
+      .get(`/v1/fragments/${postResponse.body.fragment.id}.txt`)
+      .auth('atifhammud@outlook.com', '401098004Tif@');
+
+    expect(getResponse.statusCode).toBe(200);
+    expect(getResponse.headers['content-type']).toBe('text/plain; charset=utf-8');
+  });
+
+  // Successful conversion from md to html
+  test('Convert fragment data from md to html', async () => {
+    const postResponse = await request(app)
+      .post('/v1/fragments')
+      .auth('atifhammud@outlook.com', '401098004Tif@')
+      .set({
+        'Content-Type': 'text/markdown',
+        body: '# This is a fragment',
+      });
+
+    const getResponse = await request(app)
+      .get(`/v1/fragments/${postResponse.body.fragment.id}.html`)
+      .auth('atifhammud@outlook.com', '401098004Tif@');
+
+    expect(getResponse.statusCode).toBe(200);
+    expect(getResponse.headers['content-type']).toBe('text/html; charset=utf-8');
   });
 });
 
@@ -80,6 +167,7 @@ describe('GET /v1/fragments/:id/info', () => {
     const getResponse = await request(app)
       .get(`/v1/fragments/${postResponse.body.fragment.id}/info`)
       .auth('atifhammud@outlook.com', '401098004Tif@');
+
     expect(getResponse.statusCode).toBe(200);
     expect(getResponse.body.status).toBe('ok');
   });
@@ -88,6 +176,7 @@ describe('GET /v1/fragments/:id/info', () => {
     const res = await request(app)
       .get(`/v1/fragments/randomId/info`)
       .auth('atifhammud@outlook.com', '401098004Tif@');
+
     expect(res.statusCode).toBe(404);
   });
 });

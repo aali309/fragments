@@ -1,14 +1,19 @@
+// tests/unit/fragment.test.js
+
 const { Fragment } = require('../../src/model/fragment');
 
-// Wait for a certain number of ms. Returns a Promise.
+// Wait for a certain number of ms. Feel free to change this value
+// if it isn't long enough for your test runs. Returns a Promise.
 const wait = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const validTypes = [
   `text/plain`,
+  /*
+   Currently, only text/plain is supported. Others will be added later.
+
   `text/markdown`,
   `text/html`,
   `application/json`,
-  /*
   `image/png`,
   `image/jpeg`,
   `image/webp`,
@@ -186,7 +191,6 @@ describe('Fragment class', () => {
     test('save() updates the updated date/time of a fragment', async () => {
       const ownerId = '7777';
       const fragment = new Fragment({ ownerId, type: 'text/plain', size: 0 });
-      ownerId;
       const modified1 = fragment.updated;
       await wait();
       await fragment.save();
