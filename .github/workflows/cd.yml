@@ -91,7 +91,6 @@ jobs:
             AWS_COGNITO_POOL_ID=us-east-1_uRQdoQfc0
             AWS_COGNITO_CLIENT_ID=7i7m23gfore5acpfg17lk2aldh
             API_URL=http://EC2Con-EcsEl-VOnrQpyMOPUM-1503614240.us-east-1.elb.amazonaws.com:8080
-            # ...continue the rest here...
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
