@@ -37,7 +37,7 @@ GET {{url}}
 atifhammud@outlook.com:401098004Tif@
 
 HTTP/1.1 200
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Content-Length: 19
 [Asserts]
 body == "This is a fragment!"

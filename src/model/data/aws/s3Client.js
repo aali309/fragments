@@ -13,7 +13,6 @@ const logger = require('../../../logger');
  * these, or if you're connecting to LocalStack or MinIO
  * @returns Object | undefined
  */
-
 const getCredentials = () => {
   if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
     // See https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/modules/credentials.html

@@ -1,22 +1,17 @@
 // src/routes/api/index.js
 
-/**
- * The main entry-point for the v1 version of the fragments API.
- */
 const express = require('express');
 
 const contentType = require('content-type');
-const { Fragment } = require('../../model/fragment');
-//const { createSuccessResponse } = require('../../response');
-const { getFragments, getFragmentById, getFragmentMetaDataById } = require('./get');
+const Fragment = require('../../model/fragment');
 
 // Create a router on which to mount our API endpoints
 const router = express.Router();
 
 // Define our first route, which will be: GET /v1/fragments
-router.get('/fragments', getFragments);
-router.get('/fragments/:id', getFragmentById);
-router.get('/fragments/:id/info', getFragmentMetaDataById);
+router.get('/fragments', require('./get'));
+router.get('/fragments/:id', require('./getId'));
+router.get('/fragments/:id/info', require('./getIdInfo'));
 
 // Support sending various Content-Types on the body up to 5M in size
 const rawBody = () =>
@@ -31,10 +26,11 @@ const rawBody = () =>
       return Fragment.isSupportedType(type);
     },
   });
+
 // Use a raw body parser for POST, which will give a `Buffer` Object or `{}` at `req.body`
 router.post('/fragments', rawBody(), require('./post'));
 
-// Other routes will go here later on...
+// Define our fifth route, which will be: DELETE /v1/fragments/:id
 router.delete('/fragments/:id', require('./delete'));
 
 module.exports = router;

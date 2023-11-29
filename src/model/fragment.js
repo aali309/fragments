@@ -1,5 +1,4 @@
-// Use crypto.randomUUID() to create unique IDs, see:
-// https://nodejs.org/api/crypto.html#cryptorandomuuidoptions
+// Use https://www.npmjs.com/package/nanoid to create unique IDs
 const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
@@ -14,7 +13,7 @@ const {
   writeFragmentData,
   listFragments,
   deleteFragment,
-} = require('./data/memory');
+} = require('./data');
 
 const validTypes = {
   txt: 'text/plain',
@@ -38,15 +37,8 @@ class Fragment {
       throw Error('type is not supported!');
     }
 
-    if (size) {
-      // will be sure size to be a number and have a value greater than -1
-      if (Number.isInteger(size) && size > -1) {
-        this.size = size;
-      } else {
-        throw Error('size does not have valid value!');
-      }
-    } else {
-      this.size = 0;
+    if (!Number.isInteger(size) || size < 0) {
+      throw Error('size does not have a valid value!');
     }
 
     this.id = id || randomUUID();
@@ -79,6 +71,7 @@ class Fragment {
    */
   static async byId(ownerId, id) {
     const fragment = await readFragment(ownerId, id);
+
     if (!fragment) {
       throw new Error('There is no fragment with provided ownerId or id.');
     }
@@ -89,15 +82,15 @@ class Fragment {
    * Delete the user's fragment data and metadata for the given id
    * @param {string} ownerId user's hashed email
    * @param {string} id fragment's id
-   * @returns Promise<void>
+   * @returns Promise
    */
-  static async delete(ownerId, id) {
+  static delete(ownerId, id) {
     return deleteFragment(ownerId, id);
   }
 
   /**
    * Saves the current fragment to the database
-   * @returns Promise<void>
+   * @returns Promise
    */
   async save() {
     this.updated = new Date().toISOString();
@@ -115,16 +108,16 @@ class Fragment {
   /**
    * Set's the fragment's data in the database
    * @param {Buffer} data
-   * @returns Promise<void>
+   * @returns Promise
    */
   async setData(data) {
-    if (!(data instanceof Buffer)) {
-      throw new Error('Data must be an instance of Buffer.');
+    try {
+      this.size = Buffer.byteLength(data);
+      this.updated = new Date().toISOString();
+      return await writeFragmentData(this.ownerId, this.id, data);
+    } catch (error) {
+      throw new Error(`setting fragment data failed, ${error}`);
     }
-
-    this.size = data.length;
-    this.updated = new Date().toISOString();
-    return await writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -142,7 +135,7 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    return this.mimeType.startsWith('text/');
+    return this.mimeType.includes('text');
   }
 
   /**
@@ -186,6 +179,7 @@ class Fragment {
   static isSupportedType(value) {
     return Object.values(validTypes).includes(value);
   }
+
   /**
    * returns true if the extension is supported
    *  */
@@ -216,4 +210,4 @@ class Fragment {
   }
 }
 
-module.exports.Fragment = Fragment;
+module.exports = Fragment;

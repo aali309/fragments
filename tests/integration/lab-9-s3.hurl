@@ -19,7 +19,7 @@ Authorization: Basic YXRpZmhhbW11ZEBvdXRsb29rLmNvbTo0MDEwOTgwMDRUaWZA
 Authorization: Basic YXRpZmhhbW11ZEBvdXRsb29rLmNvbTo0MDEwOTgwMDRUaWZA
 
  HTTP/1.1 200
- Content-Type: text/plain; charset=utf-8
+ Content-Type: text/plain
  [Asserts]
  body == "Hello S3!"
 

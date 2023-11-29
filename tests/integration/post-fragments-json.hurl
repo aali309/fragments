@@ -36,7 +36,7 @@ GET {{url}}
 Authorization: Basic YXRpZmhhbW11ZEBvdXRsb29rLmNvbTo0MDEwOTgwMDRUaWZA
 
 HTTP/1.1 200
-Content-Type: application/json; charset=utf-8
+Content-Type: application/json
 Content-Length: 35
 [Asserts]
 {

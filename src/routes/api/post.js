@@ -1,5 +1,8 @@
-const { Fragment } = require('../../model/fragment');
+// src/routes/api/post.js
+
 const { createSuccessResponse, createErrorResponse } = require('../../response');
+const Fragment = require('../../model/fragment');
+const logger = require('../../logger');
 
 module.exports = async (req, res) => {
   try {
@@ -16,9 +19,9 @@ module.exports = async (req, res) => {
     await fragment.save();
     await fragment.setData(req.body);
 
-    const location = `${process.env.API_URL}/v1/fragments/${fragment.id}`;
-    res.location(location);
+    logger.debug({ fragment }, 'POST /fragments');
 
+    res.setHeader('Location', `${process.env.API_URL}/v1/fragments/${fragment.id}`);
     res.status(201).json(createSuccessResponse({ fragment }));
   } catch (error) {
     res.status(500).json(createErrorResponse(500, error.message));
