@@ -24,7 +24,6 @@ module.exports = (strategyName) => {
 
       // Not authorized, return a 401
       if (!email) {
-        console.log(process.env.HTPASSWD_FILE);
         return res.status(401).json(createErrorResponse(401, 'Unauthorized'));
       }
 

@@ -30,7 +30,10 @@ const rawBody = () =>
 // Use a raw body parser for POST, which will give a `Buffer` Object or `{}` at `req.body`
 router.post('/fragments', rawBody(), require('./post'));
 
-// Define our fifth route, which will be: DELETE /v1/fragments/:id
+// Define our fifth route, DELETE /v1/fragments/:id
 router.delete('/fragments/:id', require('./delete'));
+
+//Define our sixth route PUT /fragments/:id
+router.put('/fragments/:id', rawBody(), require('./put'));
 
 module.exports = router;
