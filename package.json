@@ -33,7 +33,6 @@
     "@aws-sdk/client-dynamodb": "^3.461.0",
     "@aws-sdk/client-s3": "^3.456.0",
     "@aws-sdk/lib-dynamodb": "^3.461.0",
-    "@img/sharp-darwin-x64": "^0.33.0",
     "aws-jwt-verify": "^4.0.0",
     "compression": "^1.7.4",
     "content-type": "^1.0.4",
@@ -50,7 +49,7 @@
     "pino": "^8.15.0",
     "pino-http": "^8.5.0",
     "pino-pretty": "^10.2.0",
-    "sharp": "^0.32.0",
+    "sharp": "^0.32.4",
     "stoppable": "^1.1.0"
   },
   "bugs": {
